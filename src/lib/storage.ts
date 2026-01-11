@@ -249,6 +249,50 @@ export const exportAllDataAsJSON = () => {
   };
 };
 
+// Import all data from JSON backup
+export const importAllDataFromJSON = (jsonString: string) => {
+  const data = JSON.parse(jsonString);
+  
+  // Clear existing data first
+  const existingKeys = getStorageStructure();
+  existingKeys.forEach(key => localStorage.removeItem(key));
+  
+  // Restore users
+  if (data['data/users.json']) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(data['data/users.json']));
+  }
+  
+  // Restore job index
+  if (data['data/csv_jobs/index.json']) {
+    localStorage.setItem(JOBS_INDEX_KEY, JSON.stringify(data['data/csv_jobs/index.json']));
+  }
+  
+  // Restore individual job files
+  if (data['data/csv_jobs']) {
+    const csvJobs = data['data/csv_jobs'] as Record<string, {
+      metadata: JobMetadata | null;
+      columns: JobColumns | null;
+      flags: JobFlags | null;
+      data: JobData | null;
+    }>;
+    
+    Object.entries(csvJobs).forEach(([jobId, jobData]) => {
+      if (jobData.metadata) {
+        localStorage.setItem(getMetaPath(jobId), JSON.stringify(jobData.metadata, null, 2));
+      }
+      if (jobData.columns) {
+        localStorage.setItem(getColumnsPath(jobId), JSON.stringify(jobData.columns, null, 2));
+      }
+      if (jobData.flags) {
+        localStorage.setItem(getFlagsPath(jobId), JSON.stringify(jobData.flags, null, 2));
+      }
+      if (jobData.data) {
+        localStorage.setItem(getDataPath(jobId), JSON.stringify(jobData.data, null, 2));
+      }
+    });
+  }
+};
+
 // View storage structure (for debugging)
 export const getStorageStructure = (): string[] => {
   const keys: string[] = [];

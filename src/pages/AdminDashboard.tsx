@@ -3,6 +3,7 @@ import { Layout } from '@/components/Layout';
 import { CSVUploader } from '@/components/admin/CSVUploader';
 import { JobList } from '@/components/admin/JobList';
 import { ColumnSelector } from '@/components/admin/ColumnSelector';
+import { DataBackup } from '@/components/admin/DataBackup';
 import { CSVJob } from '@/types';
 import { getJobs } from '@/lib/storage';
 import { Card, CardContent } from '@/components/ui/card';
@@ -104,6 +105,8 @@ const AdminDashboard = () => {
           onManage={setSelectedJob}
           onRefresh={loadJobs}
         />
+
+        <DataBackup onRestore={loadJobs} />
       </div>
     </Layout>
   );
